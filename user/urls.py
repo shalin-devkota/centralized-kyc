@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import get_email_view,verify_email
+from .views import RegisterUser, GetUserData
 
-urlpatterns=[
-    path("init/",get_email_view,name="test-view"),
-    path("verify-email/",verify_email,name="verify-email")
+urlpatterns = [
+    path("register/", RegisterUser.as_view(), name="user-register"),
+    path("data/", GetUserData.as_view(), name="user-data"),
 ]
