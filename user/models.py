@@ -1,23 +1,28 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from uuid import uuid4
 import os
 
 
-def file_upload_param(file_type):
-    def file_upload(instance, filename):
-        print("Yes", instance.citizenship_number)
-        ext = filename.split(".")[-1]
-        new_filename = f"{instance.citizenship_number}_{file_type}.{ext}"
-        if file_type == "photo":
-            return os.path.join(
-                "photos", str(instance.citizenship_number), new_filename
-            )
-        else:
-            return os.path.join(
-                "citizenships", str(instance.citizenship_number), new_filename
-            )
+def upload_cit_front(instance, filename):
+    ext = filename.split(".")[-1]
+    new_filename = f"citizenship_front.{ext}"
 
-    return file_upload
+    return os.path.join("citizenships", str(instance.citizenship_number), new_filename)
+
+
+def upload_cit_back(instance, filename):
+    ext = filename.split(".")[-1]
+    new_filename = f"citizenship_back.{ext}"
+
+    return os.path.join("citizenships", str(instance.citizenship_number), new_filename)
+
+
+def upload_photo(instance, filename):
+    ext = filename.split(".")[-1]
+    new_filename = f"{instance.citizenship_number}.{ext}"
+
+    return os.path.join("photos", str(instance.citizenship_number), new_filename)
 
 
 # Create your models here.
@@ -51,13 +56,9 @@ class VerifiedUser(models.Model):
     citizen_issued_date_bs = models.DateField(
         null=False, blank=False, auto_created=False, auto_now=False
     )
-    photo = models.ImageField(upload_to=file_upload_param(file_type="photo"))
-    citizenship_front = models.ImageField(
-        upload_to=file_upload_param(file_type="citizenship_front")
-    )
-    citizenship_back = models.ImageField(
-        upload_to=file_upload_param(file_type="citizenship_back")
-    )
+    photo = models.ImageField(upload_to=upload_photo)
+    citizenship_front = models.ImageField(upload_to=upload_cit_front)
+    citizenship_back = models.ImageField(upload_to=upload_cit_back)
 
     permanent_address_district = models.CharField(
         max_length=50, null=False, blank=False
@@ -79,3 +80,21 @@ class VerifiedUser(models.Model):
 
     def __str__(self):
         return f"{self.first_name}"
+
+
+class AuthUser(AbstractUser):
+    ROLE_CHOICES = (
+        ("regulator", "Admin"),
+        ("bank", "Bank"),
+    )
+
+    email = models.EmailField(unique=True)
+    role = models.CharField(
+        max_length=20, choices=ROLE_CHOICES, null=False, blank=False
+    )
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.email
