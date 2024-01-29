@@ -1,8 +1,9 @@
 from rest_framework.generics import CreateAPIView, ListAPIView
-
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAdminUser
 
-from .serializers import UserDataSerializer
+
+from .serializers import UserDataSerializer, UserRegistrationSerializer
 from .models import VerifiedUser
 
 
@@ -23,3 +24,8 @@ class GetUserData(ListAPIView):
             if not queryset.exists():
                 raise ValidationError("Signature is invalid")
             return queryset
+
+
+class CreateUser(CreateAPIView):
+    permisson_classes = [IsAdminUser]
+    serializer_class = UserRegistrationSerializer

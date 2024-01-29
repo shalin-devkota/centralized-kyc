@@ -12,6 +12,7 @@ django = "^4.2.7"
 djangorestframework = "^3.14.0"
 markdown = "^3.5.2"
 pillow = "^10.2.0"
+djangorestframework-simplejwt = "^5.3.1"
 
 
 [build-system]
