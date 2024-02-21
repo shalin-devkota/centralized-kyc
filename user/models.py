@@ -14,8 +14,10 @@ class CustomUserManager(BaseUserManager):
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+
         user.set_password(password)
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, email, password, **other_fields):
@@ -111,8 +113,9 @@ class VerifiedUser(models.Model):
 
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
-        ("regulator", "Admin"),
+        ("regulator", "Regulator"),
         ("bank", "Bank"),
+        ("user", "User"),
     )
 
     email = models.EmailField(unique=True)
@@ -122,11 +125,10 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
-
-    objects = CustomUserManager()
+    REQUIRED_FIELDS = ["role"]
 
     def __str__(self):
         return self.email
