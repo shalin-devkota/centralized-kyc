@@ -115,7 +115,6 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ("regulator", "Regulator"),
         ("bank", "Bank"),
-        ("user", "User"),
     )
 
     email = models.EmailField(unique=True)
